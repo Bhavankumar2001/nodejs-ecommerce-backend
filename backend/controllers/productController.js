@@ -4,30 +4,33 @@ const catchAsyncError = require('../middlewares/catchAsyncError')
 const APIFeatures = require('../utils/apiFeatures');
 
 //Get Products - /api/v1/products
-exports.getProducts = catchAsyncError(async (req, res, next)=>{
+exports.getProducts = catchAsyncError(async (req, res, next) => {
     const resPerPage = 3;
-    
+    const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
+  
     let buildQuery = () => {
-        return new APIFeatures(Product.find(), req.query).search().filter()
-    }
-    
-    const filteredProductsCount = await buildQuery().query.countDocuments({})
+      return new APIFeatures(Product.find(), req.query).search().filter();
+    };
+  
+    const filteredProductsCount = await buildQuery().query.countDocuments({});
     const totalProductsCount = await Product.countDocuments({});
     let productsCount = totalProductsCount;
-
-    if(filteredProductsCount !== totalProductsCount) {
-        productsCount = filteredProductsCount;
+  
+    if (filteredProductsCount !== totalProductsCount) {
+      productsCount = filteredProductsCount;
     }
-    
-    const products = await buildQuery().paginate(resPerPage).query;
-
+  
+    // Add pagination
+    const products = await buildQuery().paginate(resPerPage, page).query;
+  
     res.status(200).json({
-        success : true,
-        count: productsCount,
-        resPerPage,
-        products
-    })
-})
+      success: true,
+      count: productsCount,
+      resPerPage,
+      products,
+    });
+  });
+  
 
 //Create Product - /api/v1/product/new
 exports.newProduct = catchAsyncError(async (req, res, next)=>{
