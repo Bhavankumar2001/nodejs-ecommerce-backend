@@ -3,8 +3,8 @@ import MetaData from "../layouts/MetaData";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { login } from "../../actions/userAction";
-
+import { clearAuthError, login } from "../../actions/userAction";
+import { Link } from 'react-router-dom'
 export default function Login() {
 
   const [email,setemail]=useState("")
@@ -20,15 +20,18 @@ export default function Login() {
    useEffect(()=>{
     if(isAuthenticated){
       navigate('/')
+      
     }
     if(error){
-      toast.error(error,{
-        position:"bottom-center"
+      toast(error,{
+        position:"bottom-center",
+        type:'error',
+        onOpen:()=>{dispatch(clearAuthError)}
       })
       return
     }
   
-   },[error,isAuthenticated])
+   },[error,isAuthenticated,dispatch,navigate])
 
   return (
     <Fragment>
@@ -73,9 +76,9 @@ export default function Login() {
               LOGIN
             </button>
 
-            <a href="#" className="float-right mt-3">
+            <Link to='/register'  className="float-right mt-3">
               New User?
-            </a>
+            </Link>
           </form>
         </div>
       </div>
